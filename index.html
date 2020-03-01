@@ -47,13 +47,13 @@
 			function onload(){
 				gameArea = document.getElementById('game_area');
 				matrixArea = document.getElementById('matrix_area');
-				for (var i=0;i<MATRIX_WIDTH;i++) {
+				/*for (var i=0;i<MATRIX_WIDTH;i++) {
 					Matrix[i] = [];
 					for(var j=0;j<MATRIX_HEIGHT;j++){
 						Matrix[i][j] = getRandom(1,5);
 					}
-				}
-				/*Matrix = 
+				}*/
+				Matrix = 
 					[[2, 3, 5, 3, 3, 2, 4, 1, 1, 5],
 					[1, 1, 1, 1, 1, 1, 2, 3, 5, 1],
 					[5, 1, 5, 5, 2, 4, 2, 5, 2, 5],
@@ -61,16 +61,20 @@
 					[5, 1, 3, 4, 3, 3, 5, 1, 4, 1],
 					[2, 5, 4, 4, 2, 5, 4, 4, 1, 3],
 					[5, 2, 3, 2, 2, 1, 1, 5, 1, 2],
-					[3, 2, 2, 2, 5, 1, 3, 1, 4, 1],
-					[5, 4, 2, 3, 5, 1, 1, 5, 3, 1],
-					[3, 3, 2, 4, 4, 1, 5, 3, 2, 3]];*/
+					[2, 2, 2, 2, 5, 1, 1, 1, 4, 1],
+					[3, 3, 2, 3, 5, 1, 1, 5, 3, 1],
+					[3, 3, 2, 4, 4, 1, 5, 1, 2, 3]];
 				renderMatrix();
-				document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
+				console.log(findTogetherBall(1,8,Matrix[1][8]));
+				//定義滑鼠移入移出時，以動畫提示相鄰同色的球
+				/*document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
 					var points = findTogetherBall(
 						parseInt(e.target.dataset['x'], 10), 
 						parseInt(e.target.dataset['y'], 10), 
 						e.target.dataset['no'], 
-						SELF);
+						SELF,
+						parseInt(e.target.dataset['x'], 10), 
+						parseInt(e.target.dataset['y'], 10));
 					hintBall(points);
 				});
 				document.querySelectorAll('.ball').forEach(x=>x.onmouseout=function(e){
@@ -78,9 +82,11 @@
 						parseInt(e.target.dataset['x'], 10), 
 						parseInt(e.target.dataset['y'], 10), 
 						e.target.dataset['no'], 
-						SELF);
+						SELF,
+						parseInt(e.target.dataset['x'], 10), 
+						parseInt(e.target.dataset['y'], 10));
 					hintBall(points);
-				});
+				});*/
 			}
 			function renderMatrix(){
 				var ball_html = '';
@@ -99,55 +105,155 @@
 			* @param int x座標
 			* @param int y座標
 			* @param int 顏色代碼
-			* @param int 從哪裡判斷過來的
 			*/
-			function findTogetherBall(i,j,no,from = SELF){
+			function findTogetherBall(x,y,no){
+				var points = [];
+				var all_check_points = [];
+				var level = 1;
+				var left_x = x;
+				var right_x = x;
+				var top_y = y;
+				var bottom_y = y;
+				//每一層符合的結果，[level]=>point[]
+				var level_result = [];
+				level_result[0] = [];
+				//用while迴圈，一圈一圈往外判斷
+				while(true){
+					all_check_points = [];
+					level_result[level] = [];
+					//定義要檢查的四條邊界
+					left_x = x - level;
+					if(left_x < 0){left_x = 0;}
+					right_x = x + level;
+					if(right_x > (MATRIX_WIDTH-1)){right_x = (MATRIX_WIDTH-1);}
+					top_y = y - level;
+					if(top_y < 0){top_y = 0;}
+					bottom_y = y + level;
+					if(bottom_y > (MATRIX_HEIGHT-1)){bottom_y = (MATRIX_HEIGHT-1);}
+					console.log('left_x='+left_x);
+					console.log('right_x='+right_x);
+					console.log('top_y='+top_y);
+					console.log('bottom_y='+bottom_y);
+					
+					//列出所有要檢查的點
+					if(x - left_x == level){
+						for(var j = top_y;j <= bottom_y;j++){
+							if(notInResult([left_x, j], all_check_points)){
+								all_check_points.push([left_x, j]);
+							}
+						}
+					}
+					if(right_x - x == level){
+						for(var j = top_y;j <= bottom_y;j++){
+							if(notInResult([right_x, j], all_check_points)){
+								all_check_points.push([right_x, j]);
+							}
+						}
+					}
+					if(y - top_y == level){
+						for(var i = left_x;i <= right_x;i++){
+							if(notInResult([i, top_y], all_check_points)){
+								all_check_points.push([i, top_y]);
+							}
+						}
+					}
+					if(bottom_y - y == level){
+						for(var i = left_x;i <= right_x;i++){
+							if(notInResult([i, bottom_y], all_check_points)){
+								all_check_points.push([i, bottom_y]);
+							}
+						}
+					}
+					//檢查每個點顏色是否相同，和前一層是否同顏色相臨
+					all_check_points.forEach((x)=>{
+						if(Matrix[x[0]][x[1]] == no){
+							//TODO 判斷每一顆的上下左右是否有同色相連
+							if(level == 1){
+								level_result[level].push(x);
+							}
+							else{
+								
+							}
+						}
+					});
+					console.log(level_result[level]);
+					if(level == 2) break;
+					//4條邊都靠到邊界時，跳出迴圈
+					if(
+						left_x <= 0 && 
+						right_x >= (MATRIX_WIDTH-1) &&
+						top_y <= 0 && 
+						bottom_y >= (MATRIX_HEIGHT-1)
+					){
+						break;
+					}
+					level++;
+				}
+			}
+			
+			/**
+			* 找到所有相鄰同顏色球的位置，斜的不算
+			* @param int x座標
+			* @param int y座標
+			* @param int 顏色代碼
+			* @param int 從哪裡判斷過來的
+			* @param int 原點x座標
+			* @param int 原點y座標
+			*/
+			/*function findTogetherBall(i,j,no,move_to,origin_x,origin_y){
 				var points = [];
 				//檢查上下左右四個方向，並注意邊界
-				if(from != RIGHT && i > 0){
-					//左
-					if(Matrix[i-1][j] == no){
-						//ltrb[0] = true;
-						points.push([i-1, j]);
-						let sub_points = findTogetherBall(i-1,j,no,LEFT);
+				if(move_to != RIGHT && i > 0){
+					//左，若是左邊來的(往右移動)，則不需檢查
+					if(Matrix[i-1][j] == no && !(i-1 == origin_x && j==origin_y)){
+						if(notInResult([i-1, j], points)){
+							points.push([i-1, j]);
+						}
+						let sub_points = findTogetherBall(i-1,j,no,LEFT,origin_x,origin_y);
 						sub_points.forEach(function(item, index){
-							if(!points.some(x=>x[0] == item[0] && x[1] == item[1])){
+							if(notInResult(item, points)){
 								points.push(item);
 							}
 						});
 					}
 				}
-				if(from != LEFT && i < (MATRIX_WIDTH - 1)){
-					//右
-					if(Matrix[i+1][j] == no){
-						points.push([i+1, j]);
-						let sub_points = findTogetherBall(i+1,j,no,RIGHT);
+				if(move_to != LEFT && i < (MATRIX_WIDTH - 1)){
+					//右，若是右邊來的(往左移動)，則不需檢查
+					if(Matrix[i+1][j] == no && !(i+1 == origin_x && j==origin_y)){
+						if(notInResult([i-1, j], points)){
+							points.push([i+1, j]);
+						}
+						let sub_points = findTogetherBall(i+1,j,no,RIGHT,origin_x,origin_y);
 						sub_points.forEach(function(item, index){
-							if(!points.some(x=>x[0] == item[0] && x[1] == item[1])){
+							if(notInResult(item, points)){
 								points.push(item);
 							}
 						});
 					}
 				}
-				if(from != BOTTOM && j > 0){
-					//上
-					if(Matrix[i][j-1] == no){
-						points.push([i, j-1]);
-						let sub_points = findTogetherBall(i,j-1,no,TOP);
+				if(move_to != BOTTOM && j > 0){
+					//上，若是上面來的(往下移動)，則不需檢查
+					if(Matrix[i][j-1] == no && !(i == origin_x && j-1 == origin_y)){
+						if(notInResult([i-1, j], points)){
+							points.push([i, j-1]);
+						}
+						let sub_points = findTogetherBall(i,j-1,no,TOP,origin_x,origin_y);
 						sub_points.forEach(function(item, index){
-							if(!points.some(x=>x[0] == item[0] && x[1] == item[1])){
+							if(notInResult(item, points)){
 								points.push(item);
 							}
 						});
 					}
 				}
-				if(from != TOP && j < (MATRIX_HEIGHT - 1)){
-					//下
-					if(Matrix[i][j+1] == no){
-						points.push([i, j+1]);
-						let sub_points = findTogetherBall(i,j+1,no,BOTTOM);
+				if(move_to != TOP && j < (MATRIX_HEIGHT - 1)){
+					//下，若是下面來的(往上移動)，則不需檢查
+					if(Matrix[i][j+1] == no && !(i == origin_x && j+1 == origin_y)){						
+						if(notInResult([i-1, j], points)){
+							points.push([i, j+1]);
+						}
+						let sub_points = findTogetherBall(i,j+1,no,BOTTOM,origin_x,origin_y);
 						sub_points.forEach(function(item, index){
-							if(!points.some(x=>x[0] == item[0] && x[1] == item[1])){
+							if(notInResult(item, points)){
 								points.push(item);
 							}
 						});
@@ -157,9 +263,15 @@
 					points.push([i,j]);
 				}
 				return points;
-			}
+			}*/
 			function hintBall(points){
 				points.forEach(x=>document.querySelector(".ball[data-x='"+x[0]+"'][data-y='"+x[1]+"']").classList.toggle('ball_clickable'));
+			}
+			/**
+			* 確認item不在positions陣列內
+			*/
+			function notInResult(item, points){
+				return !points.some(x=>x[0] == item[0] && x[1] == item[1]);
 			}
 			//產生min到max之間的亂數
 			function getRandom(min,max){
