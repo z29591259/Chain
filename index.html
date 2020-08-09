@@ -4,20 +4,41 @@
 		<meta charset="utf-8">
 		<title>連鎖反應web</title>
 		<style>
+			body{
+				padding: 0;
+				margin: 0;
+				background-color: lightgray;
+			}
+			#game_area{
+				position: absolute;
+			  	left:     50%;
+			  	top:      50%;
+				background-color: lightgray;
+			}
+			#game_area > #info_area{
+				position: absolute;
+				width: 26%;
+				right: 0;
+			}
+			#info_area > #logo{				
+				color: #555500;
+				font-size: 2.5em;
+				text-align: center;
+			}
 			#matrix_area{
 				display: flex;
 				flex-direction: column;
 				flex-wrap: wrap;
 				background-color: #e4eaff;
-				width: 600px;
-				height: 600px;
+				width: 74%;
+				height: 100%;
 			}
 			.ball{
 				display: flex;
-				flex: 0 0 56px;
-				height: 56px;
+				flex: 0 0 7.6%;
+				height: 7.6%;
 				margin: 2px;
-				border-radius: 30px;
+				border-radius: 60px;
 			}
 				.ball[data-no='1']{background-color: #ff3953;}
 				.ball[data-no='2']{background-color: #d0d309;}
@@ -37,6 +58,16 @@
 	</head>
 	<body onload="onload();">
 		<div id="game_area">
+			<div id="info_area">
+				<div id="logo">連鎖反應</div>
+				<div id="remaining_number">剩餘組數</div>
+				<div id="score_board">分數</div>
+				<div id="operation">
+					<div class="button">開始遊戲</div>
+					<div class="button">重新開始</div>
+				</div>
+				<div id="score_compare"></div>
+			</div>
 			<div id="matrix_area"></div>
 		</div>
 	</body>

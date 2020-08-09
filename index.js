@@ -1,30 +1,13 @@
 var gameArea;
 var matrixArea;
-const MATRIX_WIDTH = 10;
-const MATRIX_HEIGHT = 10;
+const MATRIX_WIDTH = 12;
+const MATRIX_HEIGHT = 12;
 var Matrix = [];
 function onload(){
 	gameArea = document.getElementById('game_area');
 	matrixArea = document.getElementById('matrix_area');
-	/*for (var i=0;i<MATRIX_WIDTH;i++) {
-		Matrix[i] = [];
-		for(var j=0;j<MATRIX_HEIGHT;j++){
-			Matrix[i][j] = getRandom(1,5);
-		}
-	}
-	console.log(Matrix);*/
-	Matrix = 
-		[[2, 3, 5, 3, 3, 2, 4, 1, 1, 5],
-		[1, 1, 1, 1, 1, 1, 2, 3, 5, 1],
-		[5, 1, 5, 5, 2, 4, 2, 5, 2, 5],
-		[2, 1, 2, 1, 1, 5, 2, 1, 5, 2],
-		[5, 1, 3, 4, 3, 3, 5, 1, 4, 1],
-		[2, 5, 4, 4, 2, 5, 4, 4, 1, 3],
-		[5, 2, 3, 2, 2, 1, 1, 5, 1, 2],
-		[2, 2, 2, 2, 5, 1, 1, 1, 4, 1],
-		[3, 3, 2, 3, 5, 1, 1, 5, 3, 1],
-		[3, 3, 2, 4, 4, 1, 5, 1, 2, 3]];
-	renderMatrix();
+	resizeGameArea();
+	startNewGame();
 		
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
 		var points = findTogetherBall(
@@ -45,32 +28,88 @@ function onload(){
 		removeBall(points);
 		unhintBall(points);
 	});
+	window.addEventListener("resize", function(){
+		resizeGameArea();
+	});
+}
+/**
+* 設定遊戲區域寬高
+*/
+function resizeGameArea(){
+	var widthToHeight = 4 / 3;
+			    
+	var newWidth = window.innerWidth;
+	var newHeight = window.innerHeight;
+	var newWidthToHeight = newWidth / newHeight;
+			    
+	if (newWidthToHeight > widthToHeight) {
+	    newWidth = newHeight * widthToHeight;
+	    gameArea.style.height = newHeight + 'px';
+	    gameArea.style.width = newWidth + 'px';
+	} else {
+	    newHeight = newWidth / widthToHeight;
+	    gameArea.style.width = newWidth + 'px';
+	    gameArea.style.height = newHeight + 'px';
+	}
+			    
+	gameArea.style.marginTop = (-newHeight / 2) + 'px';
+	gameArea.style.marginLeft = (-newWidth / 2) + 'px';		
+}
+
+function startNewGame(){
+	for (var i=0;i<MATRIX_WIDTH;i++) {
+		Matrix[i] = [];
+		for(var j=0;j<MATRIX_HEIGHT;j++){
+			Matrix[i][j] = getRandom(1,5);
+		}
+	}
+	renderMatrix();
 }
 
 function renderMatrix(){
 	var ball_html = '';
 	for (var i=0;i<MATRIX_WIDTH;i++) {
     	for(var j=0;j<MATRIX_HEIGHT;j++){
-        	ball_html += '<div class="ball" data-x="'+i+'" data-y="'+j+'" data-no="' + Matrix[i][j] + '" >'+i+','+j+'</div>';
+        	var debug_text = '';
+        	//debug_text = i+','+j;
+        	ball_html += '<div class="ball" data-x="'+i+'" data-y="'+j+'" data-no="' + Matrix[i][j] + '" >'+debug_text+'</div>';
 	 	}
 	}
 	matrixArea.innerHTML = ball_html;
 }
 
+/**
+* 消除點選的同色球，並重新排列
+* @param object[] points
+*/
 function removeBall(points){
 	//將點位歸零
 	for(var i=0;i<points.length;i++){
 		setMatrixValue(points[i], 0);
 	}
 	
-	for (var i=0;i<MATRIX_WIDTH;i++) {
+	let check_width = MATRIX_WIDTH;
+	for (var i=0;i<check_width;i++) {
 		var row = Matrix[i].filter(function(item, index, array){
 			return item != 0;
 		});
-		var changed = false;
 		if(row.length == 0){
-			//TODO 整行都是0，要移到最後一行
+			//整行都是0，要移到最後一行，並少檢查一行
+			Matrix.push(Matrix.splice(i, 1)[0]);
+			//修改dom的data-no
+			for(var j=i;j<check_width;j++){
+				Matrix[j].forEach((item, index)=>{
+					//修改dom的data-no
+					var p = document.querySelector(".ball[data-x='"+j+"'][data-y='"+index+"']");
+					p.dataset['no'] = Matrix[j][index];
+				})
+			}
+			//因為向前移一行，所以同一行再檢查一次
+			i--;
+			//最後一行全部是0則不檢查
+			check_width--;
 		}else{
+			var changed = false;
 			//若0的上面有顏色，讓他往下移動
 			while(row.length < MATRIX_HEIGHT){
 				row.unshift(0);
@@ -82,14 +121,17 @@ function removeBall(points){
 					//修改dom的data-no
 					var p = document.querySelector(".ball[data-x='"+i+"'][data-y='"+index+"']");
 					p.dataset['no'] = Matrix[i][index];
-				})
+				});
 			}
 		}
 	}
 }
+
 /**
 * 分階段尋找，每次都找相鄰的點，一次一次擴散，並且比對不和之前的點重複，避免無窮迴圈
-*/
+* @param int x
+* @param int y
+* */
 function findTogetherBall(x,y){
 	var value = getMatrixValue([x, y]);
 	if(value == 0){return [];}
