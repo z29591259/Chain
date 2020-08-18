@@ -7,8 +7,8 @@ function onload(){
 	gameArea = document.getElementById('game_area');
 	matrixArea = document.getElementById('matrix_area');
 	resizeGameArea();
-	startNewGame();
-		
+	
+	document.querySelector('#btn_start_game').addEventListener('click', startNewGame);
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
 		var points = findTogetherBall(
 			parseInt(e.target.dataset['x'], 10), 
@@ -64,18 +64,31 @@ function startNewGame(){
 		}
 	}
 	renderMatrix();
+	updateMatrixArea();
 }
-
+/**
+* 建立matrix對應的DOM
+* */
 function renderMatrix(){
 	var ball_html = '';
 	for (var i=0;i<MATRIX_WIDTH;i++) {
     	for(var j=0;j<MATRIX_HEIGHT;j++){
         	var debug_text = '';
         	//debug_text = i+','+j;
-        	ball_html += '<div class="ball" data-x="'+i+'" data-y="'+j+'" data-no="' + Matrix[i][j] + '" >'+debug_text+'</div>';
+        	ball_html += '<div class="ball" id="p'+i+'_'+j+'" data-x="'+i+'" data-y="'+j+'" data-no="0" >'+debug_text+'</div>';
 	 	}
 	}
 	matrixArea.innerHTML = ball_html;
+}
+/**
+* 將matrix值更新到DOM上
+*/
+function updateMatrixArea(){
+	for (var i=0;i<MATRIX_WIDTH;i++) {
+    	for(var j=0;j<MATRIX_HEIGHT;j++){
+        	document.querySelector('#p'+i+'_'+j).dataset['no'] = Matrix[i][j];
+	 	}
+	}
 }
 
 /**
@@ -100,7 +113,7 @@ function removeBall(points){
 			for(var j=i;j<check_width;j++){
 				Matrix[j].forEach((item, index)=>{
 					//修改dom的data-no
-					var p = document.querySelector(".ball[data-x='"+j+"'][data-y='"+index+"']");
+					var p = document.querySelector('#p'+j+'_'+index);
 					p.dataset['no'] = Matrix[j][index];
 				})
 			}
@@ -119,7 +132,7 @@ function removeBall(points){
 				Matrix[i] = row;
 				row.forEach((item, index)=>{
 					//修改dom的data-no
-					var p = document.querySelector(".ball[data-x='"+i+"'][data-y='"+index+"']");
+					var p = document.querySelector('#p'+i+'_'+index);
 					p.dataset['no'] = Matrix[i][index];
 				});
 			}
@@ -181,7 +194,7 @@ function findTogetherBall(x,y){
 
 function hintBall(points){
 	points.forEach(x=>{
-		var p = document.querySelector(".ball[data-x='"+x[0]+"'][data-y='"+x[1]+"']");
+		var p = document.querySelector('#p'+x[0]+'_'+x[1]);
 		if(p == null){
 			console.log("null point: "+x[0]+","+x[1]);
 		}else{
@@ -192,7 +205,7 @@ function hintBall(points){
 
 function unhintBall(points){
 	points.forEach(x=>{
-		var p = document.querySelector(".ball[data-x='"+x[0]+"'][data-y='"+x[1]+"']");
+		var p = document.querySelector('#p'+x[0]+'_'+x[1]);
 		if(p == null){
 			console.log("null point: "+x[0]+","+x[1]);
 		}else{
