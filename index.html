@@ -4,88 +4,93 @@
 		<meta charset="utf-8">
 		<title>連鎖反應web</title>
 		<style>
-			body{
-				padding: 0;
-				margin: 0;
-				background-color: lightgray;
-				font-size: 16px;
-			}
-			#game_area{
-				position: absolute;
-			  	left:     50%;
-			  	top:      50%;
-				background-color: lightgray;
-			}
-			#game_area > #info_area{
-				position: absolute;
-				width: 26%;
-				right: 0;
-			}
-			#matrix_area{
-				display: flex;
-				flex-direction: column;
-				flex-wrap: wrap;
-				background-color: #e4eaff;
-				width: 74%;
-				height: 100%;
-			}
-			#info_area > #logo{				
-				color: #555500;
-				font-size: 2.5em;
-				text-align: center;
-			}
-			#info_area > .info{
-				font-size: 1.2em;
-				box-sizing: content-box;
-				margin-left: 1em;
-				margin-right: 1em;
-			}
-			#info_area .info > div{
-				background-color: #ffaaff;
-			}
-			#info_area .info_value{
-				text-align: right;
-				padding-left: 1em;
-				padding-right: 1em;
-			}
-			#operation{
-				text-align: center;
-			}
-			#operation > .button{
-				width: 80%;
-			}
-			.ball{
-				display: flex;
-				flex: 0 0 7.6%;
-				height: 7.6%;
-				margin: 2px;
-				border-radius: 60px;
-			}
-				.ball[data-no='1']{background-color: #ff3953;}
-				.ball[data-no='2']{background-color: #d0d309;}
-				.ball[data-no='3']{background-color: #59a9ff;}
-				.ball[data-no='4']{background-color: #3affce;}
-				.ball[data-no='5']{background-color: #dda2ff;}
-			.ball_clickable{
-				animation: ball_hint 0.5s infinite linear;
-			}
-			
-			@keyframes ball_hint {
-				0% { transform: scale(1.0); }
-				50% { transform: scale(0.95); }
-				100% { transform: scale(1.0); }
-			}
-			
-			.button{
-				border-radius: 0.1em;
-				background-color: #aaaa00;
-				color: black;
-				padding: .3em;
-				margin: .5em;
-				margin-left: auto;
-				margin-right: auto;
-				box-sizing: content-box;
-			}
+		html {
+    		height: 100%;
+		}
+		body{
+			padding: 0;
+			margin: 0;
+			font-size: 16px;
+			height: 100%;
+			background: rgb(4,179,170);
+			background: linear-gradient(90deg, rgba(4,179,170,1) 0%, rgba(10,220,167,1) 60%, rgba(55,253,243,1) 100%);
+		}
+		#game_area{
+			position: absolute;
+		  	left:     50%;
+		  	top:      50%;
+		}
+		#game_area > #info_area{
+			position: absolute;
+			width: 26%;
+			right: 0;
+		}
+		#matrix_area{
+			display: flex;
+			flex-direction: column;
+			flex-wrap: wrap;
+			background-color: #e4eaff;
+			width: 74%;
+			height: 100%;
+		}
+		#info_area > #logo{				
+			color: #555500;
+			font-size: 2.5em;
+			text-align: center;
+		}
+		#info_area > .info{
+			font-size: 1.2em;
+			box-sizing: content-box;
+			margin-left: 1em;
+			margin-right: 1em;
+		}
+		#info_area .info > div{
+			background: rgb(131,58,180);
+			background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(29,141,253,1) 33%, rgba(252,176,69,1) 100%);
+		}
+		#info_area .info_value{
+			text-align: right;
+			padding-left: 1em;
+			padding-right: 1em;
+		}
+		#operation{
+			text-align: center;
+		}
+		#operation > .button{
+			width: 80%;
+		}
+		.ball{
+			display: flex;
+			flex: 0 0 7.6%;
+			height: 7.6%;
+			margin: 2px;
+			border-radius: 60px;
+		}
+			.ball[data-no='1']{background-color: #ff3953;}
+			.ball[data-no='2']{background-color: #d0d309;}
+			.ball[data-no='3']{background-color: #59a9ff;}
+			.ball[data-no='4']{background-color: #3affce;}
+			.ball[data-no='5']{background-color: #dda2ff;}
+		.ball_clickable{
+			animation: ball_hint 0.5s infinite linear;
+		}
+		
+		@keyframes ball_hint {
+			0% { transform: scale(1.0); }
+			50% { transform: scale(0.95); }
+			100% { transform: scale(1.0); }
+		}
+		
+		.button{
+			border-radius: 0.1em;
+			background-color: #aaaa00;
+			color: black;
+			padding: .3em;
+			margin: .5em;
+			margin-left: auto;
+			margin-right: auto;
+			box-sizing: content-box;
+		}
 		</style>
 		<script src="index.js"></script>
 	</head>
@@ -93,8 +98,8 @@
 		<div id="game_area">
 			<div id="info_area">
 				<div id="logo">連鎖反應</div>
-				<div id="remaining_number" class="info">剩餘組數&nbsp;&nbsp;<div id="clickable_amout" class="info_value">100</div></div>
-				<div id="score_board" class="info">分數&nbsp;&nbsp;<div id="score_count" class="info_value">100</div></div>
+				<div id="remaining_number" class="info">剩餘組數&nbsp;&nbsp;<div id="set_amount" class="info_value">0</div></div>
+				<div id="score_board" class="info">分數&nbsp;&nbsp;<div id="score_count" class="info_value">0</div></div>
 				<div id="operation">
 					<div id="btn_start_game" class="button">開始遊戲</div>
 					<div id="btn_reset_game" class="button">回主選單</div>

@@ -1,32 +1,55 @@
-var gameArea;
-var matrixArea;
+let GameArea;
+let MatrixArea;
 const MATRIX_WIDTH = 12;
 const MATRIX_HEIGHT = 12;
-var Matrix = [];
+
+const GAME_READY = 0;
+const GAME_START = 1;
+const GAME_PLAYING = 2;
+const GAME_OVER = 3;
+
+let CurrentStage = GAME_READY;
+let Matrix = [];
+let SetAmount = 0;
+let ScoreCount = 0;
 function onload(){
-	gameArea = document.getElementById('game_area');
-	matrixArea = document.getElementById('matrix_area');
+	GameArea = document.getElementById('game_area');
+	MatrixArea = document.getElementById('matrix_area');
 	resizeGameArea();
+	renderMatrix();
 	
-	document.querySelector('#btn_start_game').addEventListener('click', startNewGame);
+	document.querySelector('#btn_start_game').addEventListener('click', ()=>{setGameStage(GAME_START);});
+	document.querySelector('#btn_reset_game').addEventListener('click', ()=>{setGameStage(GAME_READY);});
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
+		if(CurrentStage != GAME_PLAYING){return;}
 		var points = findTogetherBall(
 			parseInt(e.target.dataset['x'], 10), 
 			parseInt(e.target.dataset['y'], 10));
 		hintBall(points);
 	});
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseout=function(e){
+		if(CurrentStage != GAME_PLAYING){return;}
 		var points = findTogetherBall(
 			parseInt(e.target.dataset['x'], 10), 
 			parseInt(e.target.dataset['y'], 10));
 		unhintBall(points);
 	});
 	document.querySelectorAll('.ball').forEach(x=>x.onclick=function(e){
+		if(CurrentStage != GAME_PLAYING){return;}
 		var points = findTogetherBall(
 			parseInt(e.target.dataset['x'], 10), 
 			parseInt(e.target.dataset['y'], 10));
-		removeBall(points);
+		if(points.length > 0){
+			//TODO 爆炸音效
+		}
+		calculateScore(points);
+		removeFromMatrix(points);
+		calSetAmount();
+		updateGameStateToUi();
 		unhintBall(points);
+		if(SetAmount == 0){
+			setGameStage(GAME_OVER);
+		}
 	});
 	window.addEventListener("resize", function(){
 		resizeGameArea();
@@ -44,27 +67,50 @@ function resizeGameArea(){
 			    
 	if (newWidthToHeight > widthToHeight) {
 	    newWidth = newHeight * widthToHeight;
-	    gameArea.style.height = newHeight + 'px';
-	    gameArea.style.width = newWidth + 'px';
+	    GameArea.style.height = newHeight + 'px';
+	    GameArea.style.width = newWidth + 'px';
 	} else {
 	    newHeight = newWidth / widthToHeight;
-	    gameArea.style.width = newWidth + 'px';
-	    gameArea.style.height = newHeight + 'px';
+	    GameArea.style.width = newWidth + 'px';
+	    GameArea.style.height = newHeight + 'px';
 	}
 			    
-	gameArea.style.marginTop = (-newHeight / 2) + 'px';
-	gameArea.style.marginLeft = (-newWidth / 2) + 'px';		
+	GameArea.style.marginTop = (-newHeight / 2) + 'px';
+	GameArea.style.marginLeft = (-newWidth / 2) + 'px';		
 }
 
-function startNewGame(){
+function setGameStage(stage){
+	CurrentStage = stage;
+	switch(CurrentStage){
+		case GAME_READY:
+			resetMatrix();
+			SetAmount = 0;
+			ScoreCount = 0;
+			updateGameStateToUi();
+			//TODO 展示動畫
+			break;
+		case GAME_START:
+			resetMatrix();
+			calSetAmount();
+			updateGameStateToUi();
+			setGameStage(GAME_PLAYING);
+			break;
+		case GAME_PLAYING:
+			//TODO 背景音樂
+			break;
+		case GAME_OVER:
+			//TODO 結束音效，輸入名稱，上傳分數
+			break;
+	}
+}
+
+function resetMatrix(){
 	for (var i=0;i<MATRIX_WIDTH;i++) {
 		Matrix[i] = [];
 		for(var j=0;j<MATRIX_HEIGHT;j++){
 			Matrix[i][j] = getRandom(1,5);
 		}
 	}
-	renderMatrix();
-	updateMatrixArea();
 }
 /**
 * 建立matrix對應的DOM
@@ -78,24 +124,61 @@ function renderMatrix(){
         	ball_html += '<div class="ball" id="p'+i+'_'+j+'" data-x="'+i+'" data-y="'+j+'" data-no="0" >'+debug_text+'</div>';
 	 	}
 	}
-	matrixArea.innerHTML = ball_html;
+	MatrixArea.innerHTML = ball_html;
 }
 /**
-* 將matrix值更新到DOM上
+* 將遊戲數值更新到UI上
 */
-function updateMatrixArea(){
+function updateGameStateToUi(){
+	document.querySelector('#set_amount').innerText = SetAmount;
+	document.querySelector('#score_count').innerText = ScoreCount;
+	//update matrix
 	for (var i=0;i<MATRIX_WIDTH;i++) {
     	for(var j=0;j<MATRIX_HEIGHT;j++){
         	document.querySelector('#p'+i+'_'+j).dataset['no'] = Matrix[i][j];
 	 	}
 	}
 }
+/**
+* 根據計算消除的數量計算分數
+* @param object[] points
+*/
+function calculateScore(points){
+	ScoreCount += (10+points.length*5) * points.length;
+}
+
+/**
+* 計算剩餘組數
+*/
+function calSetAmount(){
+	SetAmount = 0;
+	let unchecked_matrix = [];
+	for (var i=0;i<MATRIX_WIDTH;i++) {
+    	unchecked_matrix[i] = [];
+    	for(var j=0;j<MATRIX_HEIGHT;j++){
+    		unchecked_matrix[i][j] = Matrix[i][j] != 0;
+    	}
+    }
+    for (var i=0;i<MATRIX_WIDTH;i++) {
+    	for(var j=0;j<MATRIX_HEIGHT;j++){
+    		if(unchecked_matrix[i][j]){
+    			let points = findTogetherBall(i,j);
+    			if(points.length > 0){
+    				SetAmount++;
+    			}
+    			points.forEach(x=>{
+    				unchecked_matrix[x[0]][x[1]] = false;
+    			});
+    		}
+    	}
+    }
+}
 
 /**
 * 消除點選的同色球，並重新排列
 * @param object[] points
 */
-function removeBall(points){
+function removeFromMatrix(points){
 	//將點位歸零
 	for(var i=0;i<points.length;i++){
 		setMatrixValue(points[i], 0);
@@ -109,14 +192,6 @@ function removeBall(points){
 		if(row.length == 0){
 			//整行都是0，要移到最後一行，並少檢查一行
 			Matrix.push(Matrix.splice(i, 1)[0]);
-			//修改dom的data-no
-			for(var j=i;j<check_width;j++){
-				Matrix[j].forEach((item, index)=>{
-					//修改dom的data-no
-					var p = document.querySelector('#p'+j+'_'+index);
-					p.dataset['no'] = Matrix[j][index];
-				})
-			}
 			//因為向前移一行，所以同一行再檢查一次
 			i--;
 			//最後一行全部是0則不檢查
@@ -130,20 +205,17 @@ function removeBall(points){
 			}
 			if(changed){
 				Matrix[i] = row;
-				row.forEach((item, index)=>{
-					//修改dom的data-no
-					var p = document.querySelector('#p'+i+'_'+index);
-					p.dataset['no'] = Matrix[i][index];
-				});
 			}
 		}
 	}
 }
 
 /**
-* 分階段尋找，每次都找相鄰的點，一次一次擴散，並且比對不和之前的點重複，避免無窮迴圈
+* 從1點開始找相鄰的點，同色的點放入清單，檢查後從清單移除該點，接著不斷檢查清單中的點，直到清單為空
 * @param int x
 * @param int y
+* 
+* @return object[] [x,y]陣列
 * */
 function findTogetherBall(x,y){
 	var value = getMatrixValue([x, y]);
