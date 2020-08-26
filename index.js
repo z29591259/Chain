@@ -11,6 +11,7 @@ const GAME_OVER = 3;
 let CurrentStage = GAME_READY;
 let Matrix = [];
 let SetAmount = 0;
+let BallAmount = 0;
 let ScoreCount = 0;
 function onload(){
 	GameArea = document.getElementById('game_area');
@@ -85,6 +86,7 @@ function setGameStage(stage){
 		case GAME_READY:
 			resetMatrix();
 			SetAmount = 0;
+			BallAmount = 0;
 			ScoreCount = 0;
 			updateGameStateToUi();
 			//TODO 展示動畫
@@ -131,6 +133,7 @@ function renderMatrix(){
 */
 function updateGameStateToUi(){
 	document.querySelector('#set_amount').innerText = SetAmount;
+	document.querySelector('#ball_amount').innerText = BallAmount;
 	document.querySelector('#score_count').innerText = ScoreCount;
 	//update matrix
 	for (var i=0;i<MATRIX_WIDTH;i++) {
@@ -152,11 +155,13 @@ function calculateScore(points){
 */
 function calSetAmount(){
 	SetAmount = 0;
+	BallAmount = 0;
 	let unchecked_matrix = [];
 	for (var i=0;i<MATRIX_WIDTH;i++) {
     	unchecked_matrix[i] = [];
     	for(var j=0;j<MATRIX_HEIGHT;j++){
     		unchecked_matrix[i][j] = Matrix[i][j] != 0;
+    		if(Matrix[i][j] != 0) {BallAmount++;}
     	}
     }
     for (var i=0;i<MATRIX_WIDTH;i++) {
