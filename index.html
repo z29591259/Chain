@@ -33,6 +33,27 @@
 			width: 74%;
 			height: 100%;
 		}
+		#overlay{
+			display: flex;
+			justify-content: center;
+			align-items: center; 
+			background: rgba(0, 0, 0, 0.8);
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 74%;
+			height: 100%;
+			font-size: 3em;
+		}
+			#overlay > span{
+				color: white;
+				/*animation: fadeinout 3s infinite;;*/
+			}
+		@keyframes fadeinout {
+			0%   { opacity:1; }
+		  	50%  { opacity:0; }
+		  	100% { opacity:1; }
+		}
 		#info_area > #logo{				
 			color: #fff;
 			font-size: 2.5em;
@@ -101,10 +122,10 @@
 			box-sizing: content-box;
 			font-weight: bolder;
 		}
+		.hide{visibility: hidden;}
 		</style>
-		<script src="index.js"></script>
 	</head>
-	<body onload="onload();">
+	<body>
 		<div id="game_area">
 			<div id="info_area">
 				<div id="logo">連鎖反應</div>
@@ -116,9 +137,18 @@
 					<div id="btn_reset_game" class="button">回主選單</div>
 				</div>
 				<div id="score_compare"></div>
-				<div id="version">&copy;<a href="http://woodloch.blog/" target="_blank">木澤的研發腦</a> v0.1</div>
+				<div id="version">&copy;<a href="http://woodloch.blog/" target="_blank">木澤的研發腦</a> <span id="version_code"></span></div>
 			</div>
 			<div id="matrix_area"></div>
+			<div id="overlay" class="hide"><span>點擊開始遊戲!</span></div>
 		</div>
 	</body>
+	<script>
+		const VERSION_CODE = 'v0.1';
+    	document.querySelector('#version_code').innerText = VERSION_CODE;
+		//prevent js cache not update
+		var script = document.createElement('script');
+		script.src = 'index.js?v="' + VERSION_CODE;
+		document.body.appendChild(script);
+	</script>
 </html>

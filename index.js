@@ -13,13 +13,18 @@ let Matrix = [];
 let SetAmount = 0;
 let BallAmount = 0;
 let ScoreCount = 0;
+
+onload();
+
 function onload(){
 	GameArea = document.getElementById('game_area');
 	MatrixArea = document.getElementById('matrix_area');
 	resizeGameArea();
 	renderMatrix();
+	setGameStage(GAME_READY);
 	
 	document.querySelector('#btn_start_game').addEventListener('click', ()=>{setGameStage(GAME_START);});
+	document.querySelector('#overlay').addEventListener('click', ()=>{setGameStage(GAME_START);});
 	document.querySelector('#btn_reset_game').addEventListener('click', ()=>{setGameStage(GAME_READY);});
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
 		if(CurrentStage != GAME_PLAYING){return;}
@@ -84,6 +89,7 @@ function setGameStage(stage){
 	CurrentStage = stage;
 	switch(CurrentStage){
 		case GAME_READY:
+			document.querySelector('#overlay').classList.toggle('hide');
 			resetMatrix();
 			SetAmount = 0;
 			BallAmount = 0;
@@ -92,6 +98,7 @@ function setGameStage(stage){
 			//TODO 展示動畫
 			break;
 		case GAME_START:
+			document.querySelector('#overlay').classList.toggle('hide');
 			resetMatrix();
 			calSetAmount();
 			updateGameStateToUi();
