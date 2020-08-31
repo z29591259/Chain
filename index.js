@@ -123,7 +123,7 @@ function renderMatrix(){
     	for(var j=0;j<MATRIX_HEIGHT;j++){
         	var debug_text = '';
         	//debug_text = i+','+j;
-        	ball_html += '<div class="ball" id="p'+i+'_'+j+'" data-x="'+i+'" data-y="'+j+'" data-no="0" >'+debug_text+'</div>';
+        	ball_html += '<figure class="ball" id="p'+i+'_'+j+'" data-x="'+i+'" data-y="'+j+'" data-no="0" ><span class="shadow"></span>'+debug_text+'</figure>';
 	 	}
 	}
 	MatrixArea.innerHTML = ball_html;

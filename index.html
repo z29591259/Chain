@@ -12,8 +12,7 @@
 			margin: 0;
 			font-size: 16px;
 			height: 100%;
-			background: rgb(4,179,170);
-			background: linear-gradient(90deg, rgba(4,179,170,1) 0%, rgba(10,220,167,1) 60%, rgba(55,253,243,1) 100%);
+			background-image: repeating-linear-gradient(135deg, rgba(145, 145, 145, 0.02) 0px, rgba(145, 145, 145, 0.02) 39px,rgba(140, 140, 140, 0.02) 39px, rgba(140, 140, 140, 0.02) 57px,rgba(9, 9, 9, 0.02) 57px, rgba(9, 9, 9, 0.02) 91px,rgba(217, 217, 217, 0.02) 91px, rgba(217, 217, 217, 0.02) 119px,rgba(45, 45, 45, 0.02) 119px, rgba(45, 45, 45, 0.02) 141px,rgba(227, 227, 227, 0.02) 141px, rgba(227, 227, 227, 0.02) 184px,rgba(236, 236, 236, 0.02) 184px, rgba(236, 236, 236, 0.02) 227px,rgba(124, 124, 124, 0.02) 227px, rgba(124, 124, 124, 0.02) 244px),repeating-linear-gradient(135deg, rgba(39, 39, 39, 0.02) 0px, rgba(39, 39, 39, 0.02) 23px,rgba(2, 2, 2, 0.02) 23px, rgba(2, 2, 2, 0.02) 55px,rgba(13, 13, 13, 0.02) 55px, rgba(13, 13, 13, 0.02) 71px,rgba(44, 44, 44, 0.02) 71px, rgba(44, 44, 44, 0.02) 98px,rgba(240, 240, 240, 0.02) 98px, rgba(240, 240, 240, 0.02) 134px,rgba(182, 182, 182, 0.02) 134px, rgba(182, 182, 182, 0.02) 159px,rgba(246, 246, 246, 0.02) 159px, rgba(246, 246, 246, 0.02) 174px,rgba(157, 157, 157, 0.02) 174px, rgba(157, 157, 157, 0.02) 190px),repeating-linear-gradient(135deg, rgba(145, 145, 145, 0.02) 0px, rgba(145, 145, 145, 0.02) 35px,rgba(217, 217, 217, 0.02) 35px, rgba(217, 217, 217, 0.02) 53px,rgba(199, 199, 199, 0.02) 53px, rgba(199, 199, 199, 0.02) 70px,rgba(196, 196, 196, 0.02) 70px, rgba(196, 196, 196, 0.02) 114px,rgba(137, 137, 137, 0.02) 114px, rgba(137, 137, 137, 0.02) 143px,rgba(249, 249, 249, 0.02) 143px, rgba(249, 249, 249, 0.02) 191px,rgba(247, 247, 247, 0.02) 191px, rgba(247, 247, 247, 0.02) 239px,rgba(38, 38, 38, 0.02) 239px, rgba(38, 38, 38, 0.02) 273px),linear-gradient(90deg, rgb(69, 69, 69),rgb(3, 3, 3));
 		}
 		#game_area{
 			position: absolute;
@@ -24,17 +23,18 @@
 			position: absolute;
 			width: 26%;
 			right: 0;
+			top: 0;
+			bottom: 0;
 		}
 		#matrix_area{
 			display: flex;
 			flex-direction: column;
 			flex-wrap: wrap;
-			background-color: #e4eaff;
 			width: 74%;
 			height: 100%;
 		}
 		#info_area > #logo{				
-			color: #555500;
+			color: #fff;
 			font-size: 2.5em;
 			text-align: center;
 		}
@@ -45,14 +45,23 @@
 			margin-right: 1em;
 		}
 		#info_area .info > div{
-			background: rgb(131,58,180);
-			background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(29,141,253,1) 33%, rgba(252,176,69,1) 100%);
+			background-image: linear-gradient(135deg, transparent 0%, transparent 6%,rgba(71, 71, 71,0.04) 6%, rgba(71, 71, 71,0.04) 22%,transparent 22%, transparent 100%),linear-gradient(45deg, transparent 0%, transparent 20%,rgba(71, 71, 71,0.04) 20%, rgba(71, 71, 71,0.04) 47%,transparent 47%, transparent 100%),linear-gradient(135deg, transparent 0%, transparent 24%,rgba(71, 71, 71,0.04) 24%, rgba(71, 71, 71,0.04) 62%,transparent 62%, transparent 100%),linear-gradient(45deg, transparent 0%, transparent 73%,rgba(71, 71, 71,0.04) 73%, rgba(71, 71, 71,0.04) 75%,transparent 75%, transparent 100%),linear-gradient(90deg, rgb(255,255,255),rgb(255,255,255));
 		}
 		#info_area .info_value{
 			text-align: right;
 			padding-left: 1em;
 			padding-right: 1em;
 		}
+		#version{
+			position: absolute;
+			bottom: .5em;
+			right: .5em;
+			color: #fff;
+		}
+			#version > a{
+				text-decoration-color: white;
+				color: #fff;
+			}
 		#operation{
 			text-align: center;
 		}
@@ -66,11 +75,11 @@
 			margin: 2px;
 			border-radius: 60px;
 		}
-			.ball[data-no='1']{background-color: #ff3953;}
-			.ball[data-no='2']{background-color: #d0d309;}
-			.ball[data-no='3']{background-color: #59a9ff;}
-			.ball[data-no='4']{background-color: #3affce;}
-			.ball[data-no='5']{background-color: #dda2ff;}
+			.ball[data-no='1']{background: radial-gradient(circle at 100% 100%, #ff3953, #bcbcbc);}
+			.ball[data-no='2']{background: radial-gradient(circle at 100% 100%, #d0d309, #bcbcbc);}
+			.ball[data-no='3']{background: radial-gradient(circle at 100% 100%, #59a9ff, #bcbcbc);}
+			.ball[data-no='4']{background: radial-gradient(circle at 100% 100%, #3affce, #bcbcbc);}
+			.ball[data-no='5']{background: radial-gradient(circle at 100% 100%, #dda2ff, #bcbcbc);}
 		.ball_clickable{
 			animation: ball_hint 0.5s infinite linear;
 		}
@@ -83,13 +92,14 @@
 		
 		.button{
 			border-radius: 0.1em;
-			background-color: #aaaa00;
+			background-image: repeating-linear-gradient(135deg, rgba(101, 101, 101, 0.1) 0px, rgba(101, 101, 101, 0.1) 15px,rgba(229, 229, 229, 0.1) 15px, rgba(229, 229, 229, 0.1) 37px,rgba(218, 218, 218, 0.1) 37px, rgba(218, 218, 218, 0.1) 79px,rgba(94, 94, 94, 0.1) 79px, rgba(94, 94, 94, 0.1) 100px,rgba(100, 100, 100, 0.1) 100px, rgba(100, 100, 100, 0.1) 148px,rgba(182, 182, 182, 0.1) 148px, rgba(182, 182, 182, 0.1) 175px),repeating-linear-gradient(135deg, rgba(21, 21, 21, 0.1) 0px, rgba(21, 21, 21, 0.1) 36px,rgba(13, 13, 13, 0.1) 36px, rgba(13, 13, 13, 0.1) 53px,rgba(229, 229, 229, 0.1) 53px, rgba(229, 229, 229, 0.1) 100px,rgba(96, 96, 96, 0.1) 100px, rgba(96, 96, 96, 0.1) 144px,rgba(109, 109, 109, 0.1) 144px, rgba(109, 109, 109, 0.1) 170px,rgba(89, 89, 89, 0.1) 170px, rgba(89, 89, 89, 0.1) 200px),repeating-linear-gradient(135deg, rgba(185, 185, 185, 0.1) 0px, rgba(185, 185, 185, 0.1) 117px,rgba(12, 12, 12, 0.1) 117px, rgba(12, 12, 12, 0.1) 170px,rgba(216, 216, 216, 0.1) 170px, rgba(216, 216, 216, 0.1) 264px,rgba(137, 137, 137, 0.1) 264px, rgba(137, 137, 137, 0.1) 329px,rgba(74, 74, 74, 0.1) 329px, rgba(74, 74, 74, 0.1) 413px,rgba(233, 233, 233, 0.1) 413px, rgba(233, 233, 233, 0.1) 535px),repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0.1) 56px,rgba(91, 91, 91, 0.1) 56px, rgba(91, 91, 91, 0.1) 106px,rgba(214, 214, 214, 0.1) 106px, rgba(214, 214, 214, 0.1) 162px,rgba(100, 100, 100, 0.1) 162px, rgba(100, 100, 100, 0.1) 253px,rgba(232, 232, 232, 0.1) 253px, rgba(232, 232, 232, 0.1) 402px,rgba(208, 208, 208, 0.1) 402px, rgba(208, 208, 208, 0.1) 461px),linear-gradient(90deg, rgb(94, 129, 235),rgb(58, 136, 236));
 			color: black;
 			padding: .3em;
 			margin: .5em;
 			margin-left: auto;
 			margin-right: auto;
 			box-sizing: content-box;
+			font-weight: bolder;
 		}
 		</style>
 		<script src="index.js"></script>
@@ -106,6 +116,7 @@
 					<div id="btn_reset_game" class="button">回主選單</div>
 				</div>
 				<div id="score_compare"></div>
+				<div id="version">&copy;<a href="http://woodloch.blog/" target="_blank">木澤的研發腦</a> v0.1</div>
 			</div>
 			<div id="matrix_area"></div>
 		</div>
