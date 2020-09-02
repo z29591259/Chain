@@ -8,6 +8,13 @@ const GAME_START = 1;
 const GAME_PLAYING = 2;
 const GAME_OVER = 3;
 
+const TEXT_CLICK_START = '點擊開始遊戲!';
+const TEXT_GAME_OVER_NOVICE = '~初心者~<br />歡迎繼續挑戰喔';
+const TEXT_GAME_OVER_INTERMEDIATE = '~熟手~<br />表現得不錯喔!';
+const TEXT_GAME_OVER_EXPERT  = '~高手~<br />凡人到不了的境界!';
+const TEXT_GAME_OVER_MASTER = '~達人~<br />無法置信的強大!!';
+const TEXT_GAME_OVER_HOLY = '~真．達人~<br />真是太不可思議了!!!';
+
 let CurrentStage = GAME_READY;
 let Matrix = [];
 let SetAmount = 0;
@@ -24,7 +31,16 @@ function onload(){
 	setGameStage(GAME_READY);
 	
 	document.querySelector('#btn_start_game').addEventListener('click', ()=>{setGameStage(GAME_START);});
-	document.querySelector('#overlay').addEventListener('click', ()=>{setGameStage(GAME_START);});
+	document.querySelector('#overlay').addEventListener('click', ()=>{
+		switch(CurrentStage){
+			case GAME_READY:
+				setGameStage(GAME_START);
+				break;
+			case GAME_OVER:
+				setGameStage(GAME_READY);
+				break;
+		}
+	});
 	document.querySelector('#btn_reset_game').addEventListener('click', ()=>{setGameStage(GAME_READY);});
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
 		if(CurrentStage != GAME_PLAYING){return;}
@@ -89,7 +105,7 @@ function setGameStage(stage){
 	CurrentStage = stage;
 	switch(CurrentStage){
 		case GAME_READY:
-			document.querySelector('#overlay').classList.toggle('hide');
+			setOverlay(TEXT_CLICK_START, true);
 			resetMatrix();
 			SetAmount = 0;
 			BallAmount = 0;
@@ -98,19 +114,35 @@ function setGameStage(stage){
 			//TODO 展示動畫
 			break;
 		case GAME_START:
-			document.querySelector('#overlay').classList.toggle('hide');
 			resetMatrix();
 			calSetAmount();
 			updateGameStateToUi();
 			setGameStage(GAME_PLAYING);
 			break;
 		case GAME_PLAYING:
+			setOverlay('', false);
 			//TODO 背景音樂
 			break;
 		case GAME_OVER:
+			var text = TEXT_GAME_OVER_NOVICE;
+			if(BallAmount == 0){
+				text = TEXT_GAME_OVER_HOLY;
+			}else if(BallAmount < 10){
+				text = TEXT_GAME_OVER_MASTER;
+			}else if(BallAmount < 30){
+				text = TEXT_GAME_OVER_EXPERT;
+			}else if(BallAmount < 50){
+				text = TEXT_GAME_OVER_INTERMEDIATE;
+			}
+			setOverlay(text, true);
 			//TODO 結束音效，輸入名稱，上傳分數
 			break;
 	}
+}
+
+function setOverlay(text, isVisible){
+	document.querySelector('#overlay').className = isVisible ? '' : 'hide';
+	document.querySelector('#overlay > span').innerHTML = text;
 }
 
 function resetMatrix(){
