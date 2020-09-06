@@ -30,7 +30,16 @@ function onload(){
 	renderMatrix();
 	setGameStage(GAME_READY);
 	
-	document.querySelector('#btn_start_game').addEventListener('click', ()=>{setGameStage(GAME_START);});
+	document.querySelector('#btn_start_game').addEventListener('click', ()=>{
+		switch(CurrentStage){
+			case GAME_READY:
+				setGameStage(GAME_START);
+				break;
+			case GAME_PLAYING:
+				setGameStage(GAME_READY);
+				break;
+		}
+	});
 	document.querySelector('#overlay').addEventListener('click', ()=>{
 		switch(CurrentStage){
 			case GAME_READY:
@@ -41,7 +50,6 @@ function onload(){
 				break;
 		}
 	});
-	document.querySelector('#btn_reset_game').addEventListener('click', ()=>{setGameStage(GAME_READY);});
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseenter=function(e){
 		if(CurrentStage != GAME_PLAYING){return;}
 		var points = findTogetherBall(
@@ -105,6 +113,7 @@ function setGameStage(stage){
 	CurrentStage = stage;
 	switch(CurrentStage){
 		case GAME_READY:
+			document.querySelector('#btn_start_game').innerText = '開始遊戲';
 			setOverlay(TEXT_CLICK_START, true);
 			resetMatrix();
 			SetAmount = 0;
@@ -120,6 +129,7 @@ function setGameStage(stage){
 			setGameStage(GAME_PLAYING);
 			break;
 		case GAME_PLAYING:
+			document.querySelector('#btn_start_game').innerText = '回主選單';
 			setOverlay('', false);
 			//TODO 背景音樂
 			break;
