@@ -16,10 +16,13 @@ const TEXT_GAME_OVER_MASTER = '~達人~<br />無法置信的強大!!';
 const TEXT_GAME_OVER_HOLY = '~真．達人~<br />真是太不可思議了!!!';
 
 let CurrentStage = GAME_READY;
+let CanClickBall = true;
 let Matrix = [];
+let UndoMatrix = [];
 let SetAmount = 0;
 let BallAmount = 0;
-let ScoreCount = 0;
+//使用陣列紀錄每次增加的分數，方便復原上一步
+let ScoreCount = [0];
 
 onload();
 
@@ -40,6 +43,14 @@ function onload(){
 				break;
 		}
 	});
+	document.querySelector('#btn_undo').addEventListener('click', ()=>{
+		if(CurrentStage != GAME_PLAYING){return;}
+		undo();
+		updateGameStateToUi();
+		if(UndoMatrix.length == 0){
+			document.querySelector('#btn_undo').classList.add('not-show');
+		}
+	});
 	document.querySelector('#overlay').addEventListener('click', ()=>{
 		switch(CurrentStage){
 			case GAME_READY:
@@ -58,29 +69,42 @@ function onload(){
 		hintBall(points);
 	});
 	document.querySelectorAll('.ball').forEach(x=>x.onmouseout=function(e){
-		if(CurrentStage != GAME_PLAYING){return;}
+		if(CurrentStage != GAME_PLAYING || !CanClickBall){return;}
 		var points = findTogetherBall(
 			parseInt(e.target.dataset['x'], 10), 
 			parseInt(e.target.dataset['y'], 10));
 		unhintBall(points);
 	});
-	document.querySelectorAll('.ball').forEach(x=>x.onclick=function(e){
-		if(CurrentStage != GAME_PLAYING){return;}
+	document.querySelectorAll('.ball').forEach(x=>x.onclick=async function(e){
+		if(CurrentStage != GAME_PLAYING || !CanClickBall){return;}
 		var points = findTogetherBall(
 			parseInt(e.target.dataset['x'], 10), 
 			parseInt(e.target.dataset['y'], 10));
+		
 		if(points.length > 0){
+			//2維陣列需要使用map處理每一層複製，避免reference
+			UndoMatrix.push(Matrix.map((arr)=>{
+			    return arr.slice();
+			}));
+			unhintBall(points);
+			
+			CanClickBall = false;
+			points.forEach(x=>document.querySelector('#p'+x[0]+'_'+x[1]).classList.add('ball_clicked'));
+			await sleep(600);
+			
+			document.querySelector('#btn_undo').classList.remove('not-show');
 			//TODO 爆炸音效
+			calculateScore(points);
+			removeFromMatrix(points);
+			calSetAmount();
+			points.forEach(x=>document.querySelector('#p'+x[0]+'_'+x[1]).classList.remove('ball_clicked'));
+			updateGameStateToUi();
+			if(SetAmount == 0){
+				setGameStage(GAME_OVER);
+			}
+			CanClickBall = true;
 		}
-		calculateScore(points);
-		removeFromMatrix(points);
-		calSetAmount();
-		updateGameStateToUi();
-		unhintBall(points);
-		if(SetAmount == 0){
-			setGameStage(GAME_OVER);
-		}
-	});
+	});	
 	window.addEventListener("resize", function(){
 		resizeGameArea();
 	});
@@ -114,11 +138,12 @@ function setGameStage(stage){
 	switch(CurrentStage){
 		case GAME_READY:
 			document.querySelector('#btn_start_game').innerText = '開始遊戲';
+			document.querySelector('#btn_undo').classList.add('not-show');
 			setOverlay(TEXT_CLICK_START, true);
 			resetMatrix();
 			SetAmount = 0;
 			BallAmount = 0;
-			ScoreCount = 0;
+			ScoreCount = [0];
 			updateGameStateToUi();
 			//TODO 展示動畫
 			break;
@@ -148,6 +173,11 @@ function setGameStage(stage){
 			//TODO 結束音效，輸入名稱，上傳分數
 			break;
 	}
+}
+
+function undo(){
+	Matrix = UndoMatrix.pop();
+	ScoreCount.pop();
 }
 
 function setOverlay(text, isVisible){
@@ -183,11 +213,12 @@ function renderMatrix(){
 function updateGameStateToUi(){
 	document.querySelector('#set_amount').innerText = SetAmount;
 	document.querySelector('#ball_amount').innerText = BallAmount;
-	document.querySelector('#score_count').innerText = ScoreCount;
+	document.querySelector('#score_count').innerText = ScoreCount.reduce((a,b) => a + b, 0);
 	//update matrix
 	for (var i=0;i<MATRIX_WIDTH;i++) {
     	for(var j=0;j<MATRIX_HEIGHT;j++){
         	document.querySelector('#p'+i+'_'+j).dataset['no'] = Matrix[i][j];
+        	unhintBall([[i,j]]);
 	 	}
 	}
 }
@@ -196,7 +227,7 @@ function updateGameStateToUi(){
 * @param object[] points
 */
 function calculateScore(points){
-	ScoreCount += (10+points.length*5) * points.length;
+	ScoreCount.push((10+points.length*5) * points.length);
 }
 
 /**
@@ -347,6 +378,12 @@ function getMatrixValue(point){
 function setMatrixValue(point, value){
 	Matrix[point[0]][point[1]] = value;
 }
+
+/**
+* 暫停特定時間(ms)
+* @var delay_ms
+*/
+const sleep = (delay_ms) => new Promise((resolve) => setTimeout(resolve, delay_ms));
 /**
 * item是否在positions陣列內
 * @param object item
