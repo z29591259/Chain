@@ -3,10 +3,11 @@ let MatrixArea;
 const MATRIX_WIDTH = 12;
 const MATRIX_HEIGHT = 12;
 
-const GAME_READY = 0;
-const GAME_START = 1;
-const GAME_PLAYING = 2;
-const GAME_OVER = 3;
+const GAME_LOADING = 0;
+const GAME_READY = 1;
+const GAME_START = 2;
+const GAME_PLAYING = 3;
+const GAME_OVER = 4;
 
 const TEXT_CLICK_START = '點擊開始遊戲!';
 const TEXT_GAME_OVER_NOVICE = '~初心者~<br />歡迎繼續挑戰喔';
@@ -14,6 +15,8 @@ const TEXT_GAME_OVER_INTERMEDIATE = '~熟手~<br />表現得不錯喔!';
 const TEXT_GAME_OVER_EXPERT  = '~高手~<br />凡人到不了的境界!';
 const TEXT_GAME_OVER_MASTER = '~達人~<br />無法置信的強大!!';
 const TEXT_GAME_OVER_HOLY = '~真．達人~<br />真是太不可思議了!!!';
+
+const SOUND_BG1 = 'bg1'
 
 let CurrentStage = GAME_READY;
 let CanClickBall = true;
@@ -24,6 +27,9 @@ let BallAmount = 0;
 //使用陣列紀錄每次增加的分數，方便復原上一步
 let ScoreCount = [0];
 
+const AssetLoaderInstance = new AssetLoader({
+	'title_audio':'title.mp3'
+});
 onload();
 
 function onload(){
@@ -31,7 +37,7 @@ function onload(){
 	MatrixArea = document.getElementById('matrix_area');
 	resizeGameArea();
 	renderMatrix();
-	setGameStage(GAME_READY);
+	setGameStage(GAME_LOADING);
 	
 	document.querySelector('#btn_start_game').addEventListener('click', ()=>{
 		switch(CurrentStage){
@@ -136,6 +142,9 @@ function resizeGameArea(){
 function setGameStage(stage){
 	CurrentStage = stage;
 	switch(CurrentStage){
+		case GAME_LOADING:
+			const assetLoader = new AssetLoader();
+			break;
 		case GAME_READY:
 			document.querySelector('#btn_start_game').innerText = '開始遊戲';
 			document.querySelector('#btn_undo').classList.add('not-show');
@@ -145,7 +154,6 @@ function setGameStage(stage){
 			BallAmount = 0;
 			ScoreCount = [0];
 			updateGameStateToUi();
-			//TODO 展示動畫
 			break;
 		case GAME_START:
 			resetMatrix();

@@ -164,9 +164,13 @@
 	<script>
 		const VERSION_CODE = 'v0.2';
     	document.querySelector('#version_code').innerText = VERSION_CODE;
-		//prevent js cache not update
+		//prevent js cache not update		
+		var assetloader_script = document.createElement('script');
+		assetloader_script.src = 'AssetLoader.js?v=' + VERSION_CODE;
+		document.body.appendChild(assetloader_script);
+		
 		var script = document.createElement('script');
-		script.src = 'index.js?v="' + VERSION_CODE;
+		script.src = 'index.js?v=' + VERSION_CODE;
 		document.body.appendChild(script);
 	</script>
 </html>
