@@ -16,7 +16,14 @@ const TEXT_GAME_OVER_EXPERT  = '~高手~<br />凡人到不了的境界!';
 const TEXT_GAME_OVER_MASTER = '~達人~<br />無法置信的強大!!';
 const TEXT_GAME_OVER_HOLY = '~真．達人~<br />真是太不可思議了!!!';
 
-const SOUND_BG1 = 'bg1'
+const SOUND_BG1 = 'bg1';
+const SOUND_BG2 = 'bg2';
+const SOUND_BG3 = 'bg3';
+const SOUND_BUTTON_CLICK = 'button_click';
+const SOUND_GAME_OVER = 'game_over';
+const SOUND_BALL_LESS = 'ball_less';
+const SOUND_BALL_MANY = 'ball_many';
+const SOUND_BALL_MORE = 'ball_more';
 
 let CurrentStage = GAME_READY;
 let CanClickBall = true;
@@ -143,7 +150,25 @@ function setGameStage(stage){
 	CurrentStage = stage;
 	switch(CurrentStage){
 		case GAME_LOADING:
-			const assetLoader = new AssetLoader();
+			const assetLoader = new AssetLoader({
+				SOUND_BG1: 'audio/bg1.mp3',
+				SOUND_BG2: 'audio/bg2.mp3',
+				SOUND_BG3: 'audio/bg3.mp3',
+				SOUND_BUTTON_CLICK: 'audio/button_click.mp3',
+				SOUND_GAME_OVER: 'audio/gameover.mp3',
+				SOUND_BALL_LESS: 'audio/less.mp3',
+				SOUND_BALL_MANY: 'audio/many.mp3',
+				SOUND_BALL_MORE: 'audio/more.mp3'
+			});
+			assetLoader
+				.Progress((key, percent, successCount, totalCount)=>{
+					console.log('key=>'+key+', percent=>'+percent+', successCount=>'+successCount+', totalCount=>'+totalCount);
+					
+					setOverlay('正在載入...<br />' + percent + '%', true);
+					if(percent === 100){ setGameStage(GAME_READY); }
+				}).LoadError((key, errorCount, totalCount)=>{
+					console.log('key=>'+key+', errorCount=>'+errorCount+', totalCount=>'+totalCount);
+				}).StartUntilEnd();
 			break;
 		case GAME_READY:
 			document.querySelector('#btn_start_game').innerText = '開始遊戲';
