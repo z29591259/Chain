@@ -61,6 +61,7 @@ class AssetLoader{
 		//計算總進度和回報key
 		this.SuccessCount++;
 		const percent = Math.floor(this.SuccessCount * 100 / this.TotalCount);
+		if(percent > 100){ return; }
 		this.OnProgressCallback(key, percent, this.SuccessCount, this.TotalCount);
 	}
 	

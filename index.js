@@ -24,6 +24,17 @@ const SOUND_GAME_OVER = 'game_over';
 const SOUND_BALL_LESS = 'ball_less';
 const SOUND_BALL_MANY = 'ball_many';
 const SOUND_BALL_MORE = 'ball_more';
+const assetLoader = new AssetLoader({
+	[SOUND_BG1]: 'audio/bg1.mp3',
+	[SOUND_BG2]: 'audio/bg2.mp3',
+	[SOUND_BG3]: 'audio/bg3.mp3',
+	[SOUND_BUTTON_CLICK]: 'audio/button_click.mp3',
+	[SOUND_GAME_OVER]: 'audio/gameover.mp3',
+	[SOUND_BALL_LESS]: 'audio/less.mp3',
+	[SOUND_BALL_MANY]: 'audio/many.mp3',
+	[SOUND_BALL_MORE]: 'audio/more.mp3'
+});
+let currentBgMusic;
 
 let CurrentStage = GAME_READY;
 let CanClickBall = true;
@@ -34,9 +45,9 @@ let BallAmount = 0;
 //使用陣列紀錄每次增加的分數，方便復原上一步
 let ScoreCount = [0];
 
-const AssetLoaderInstance = new AssetLoader({
-	'title_audio':'title.mp3'
-});
+const POINT_LESS = 5;
+const POINT_MANY = 10;
+
 onload();
 
 function onload(){
@@ -47,17 +58,20 @@ function onload(){
 	setGameStage(GAME_LOADING);
 	
 	document.querySelector('#btn_start_game').addEventListener('click', ()=>{
+		assetLoader.AssetDictionary[SOUND_BUTTON_CLICK].play();
 		switch(CurrentStage){
 			case GAME_READY:
 				setGameStage(GAME_START);
 				break;
 			case GAME_PLAYING:
+			case GAME_OVER:
 				setGameStage(GAME_READY);
 				break;
 		}
 	});
 	document.querySelector('#btn_undo').addEventListener('click', ()=>{
 		if(CurrentStage != GAME_PLAYING){return;}
+		assetLoader.AssetDictionary[SOUND_BUTTON_CLICK].play();
 		undo();
 		updateGameStateToUi();
 		if(UndoMatrix.length == 0){
@@ -65,6 +79,7 @@ function onload(){
 		}
 	});
 	document.querySelector('#overlay').addEventListener('click', ()=>{
+		assetLoader.AssetDictionary[SOUND_BUTTON_CLICK].play();
 		switch(CurrentStage){
 			case GAME_READY:
 				setGameStage(GAME_START);
@@ -103,10 +118,17 @@ function onload(){
 			
 			CanClickBall = false;
 			points.forEach(x=>document.querySelector('#p'+x[0]+'_'+x[1]).classList.add('ball_clicked'));
-			await sleep(600);
+			if(points.length <= POINT_LESS){
+				assetLoader.AssetDictionary[SOUND_BALL_LESS].play();
+			}else if(points.length <= POINT_MANY){
+				assetLoader.AssetDictionary[SOUND_BALL_MANY].play();
+			}else{
+				assetLoader.AssetDictionary[SOUND_BALL_MORE].play();
+			}
+			await sleep(420);
 			
 			document.querySelector('#btn_undo').classList.remove('not-show');
-			//TODO 爆炸音效
+			
 			calculateScore(points);
 			removeFromMatrix(points);
 			calSetAmount();
@@ -150,20 +172,9 @@ function setGameStage(stage){
 	CurrentStage = stage;
 	switch(CurrentStage){
 		case GAME_LOADING:
-			const assetLoader = new AssetLoader({
-				SOUND_BG1: 'audio/bg1.mp3',
-				SOUND_BG2: 'audio/bg2.mp3',
-				SOUND_BG3: 'audio/bg3.mp3',
-				SOUND_BUTTON_CLICK: 'audio/button_click.mp3',
-				SOUND_GAME_OVER: 'audio/gameover.mp3',
-				SOUND_BALL_LESS: 'audio/less.mp3',
-				SOUND_BALL_MANY: 'audio/many.mp3',
-				SOUND_BALL_MORE: 'audio/more.mp3'
-			});
 			assetLoader
 				.Progress((key, percent, successCount, totalCount)=>{
-					console.log('key=>'+key+', percent=>'+percent+', successCount=>'+successCount+', totalCount=>'+totalCount);
-					
+					//console.log('key=>'+key+', percent=>'+percent+', successCount=>'+successCount+', totalCount=>'+totalCount);
 					setOverlay('正在載入...<br />' + percent + '%', true);
 					if(percent === 100){ setGameStage(GAME_READY); }
 				}).LoadError((key, errorCount, totalCount)=>{
@@ -178,18 +189,23 @@ function setGameStage(stage){
 			SetAmount = 0;
 			BallAmount = 0;
 			ScoreCount = [0];
+			UndoMatrix = [];
 			updateGameStateToUi();
+			if(currentBgMusic === undefined){
+				setupBgMusic();
+			}
+			pauseBgMusic();
 			break;
 		case GAME_START:
 			resetMatrix();
 			calSetAmount();
 			updateGameStateToUi();
 			setGameStage(GAME_PLAYING);
+			playBgMusic();
 			break;
 		case GAME_PLAYING:
 			document.querySelector('#btn_start_game').innerText = '回主選單';
 			setOverlay('', false);
-			//TODO 背景音樂
 			break;
 		case GAME_OVER:
 			var text = TEXT_GAME_OVER_NOVICE;
@@ -202,10 +218,39 @@ function setGameStage(stage){
 			}else if(BallAmount < 50){
 				text = TEXT_GAME_OVER_INTERMEDIATE;
 			}
-			setOverlay(text, true);
-			//TODO 結束音效，輸入名稱，上傳分數
+			setOverlay(text, true);			
+			document.querySelector('#btn_undo').classList.add('not-show');
+			pauseBgMusic();
+			assetLoader.AssetDictionary[SOUND_GAME_OVER].play();
 			break;
 	}
+}
+
+function setupBgMusic(){
+	currentBgMusic = assetLoader.AssetDictionary[SOUND_BG1];
+	assetLoader.AssetDictionary[SOUND_BG1].addEventListener("ended", ()=>{
+		currentBgMusic.currentTime = 0;
+		currentBgMusic = assetLoader.AssetDictionary[SOUND_BG2];
+		currentBgMusic.play();
+	});
+	assetLoader.AssetDictionary[SOUND_BG2].addEventListener("ended", ()=>{
+		currentBgMusic.currentTime = 0;
+		currentBgMusic = assetLoader.AssetDictionary[SOUND_BG3];
+		currentBgMusic.play();
+	});
+	assetLoader.AssetDictionary[SOUND_BG3].addEventListener("ended", ()=>{
+		currentBgMusic.currentTime = 0;
+		currentBgMusic = assetLoader.AssetDictionary[SOUND_BG1];
+		currentBgMusic.play();
+	});
+}
+
+function playBgMusic(){
+	currentBgMusic.play();
+}
+
+function pauseBgMusic(){
+	currentBgMusic.pause();
 }
 
 function undo(){
