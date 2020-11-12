@@ -280,7 +280,7 @@ function renderMatrix(){
     	for(var j=0;j<MATRIX_HEIGHT;j++){
         	var debug_text = '';
         	//debug_text = i+','+j;
-        	ball_html += '<figure class="ball" id="p'+i+'_'+j+'" data-x="'+i+'" data-y="'+j+'" data-no="0" ><span class="shadow"></span>'+debug_text+'</figure>';
+        	ball_html += '<figure class="ball" id="p'+i+'_'+j+'" data-x="'+i+'" data-y="'+j+'" data-no="0" >'+debug_text+'</figure>';
 	 	}
 	}
 	MatrixArea.innerHTML = ball_html;
@@ -318,23 +318,23 @@ function calSetAmount(){
 	for (var i=0;i<MATRIX_WIDTH;i++) {
     	unchecked_matrix[i] = [];
     	for(var j=0;j<MATRIX_HEIGHT;j++){
-    		unchecked_matrix[i][j] = Matrix[i][j] != 0;
-    		if(Matrix[i][j] != 0) {BallAmount++;}
-    	}
-    }
-    for (var i=0;i<MATRIX_WIDTH;i++) {
-    	for(var j=0;j<MATRIX_HEIGHT;j++){
-    		if(unchecked_matrix[i][j]){
-    			let points = findTogetherBall(i,j);
-    			if(points.length > 0){
-    				SetAmount++;
-    			}
-    			points.forEach(x=>{
-    				unchecked_matrix[x[0]][x[1]] = false;
-    			});
-    		}
-    	}
-    }
+			unchecked_matrix[i][j] = Matrix[i][j] != 0;
+			if(Matrix[i][j] != 0) {BallAmount++;}
+		}
+	}
+	for (var i=0;i<MATRIX_WIDTH;i++) {
+		for(var j=0;j<MATRIX_HEIGHT;j++){
+			if(unchecked_matrix[i][j]){
+				let points = findTogetherBall(i,j);
+				if(points.length > 0){
+					SetAmount++;
+				}
+				points.forEach(x=>{
+					unchecked_matrix[x[0]][x[1]] = false;
+				});
+			}
+		}
+	}
 }
 
 /**
