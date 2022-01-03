@@ -158,7 +158,6 @@ function onload() {
 function onMouseUpdate(e) {
 	MouseX = e.pageX;
 	MouseY = e.pageY;
-	console.log(MouseX, MouseY);
 }
 /**
 * 設定遊戲區域寬高
