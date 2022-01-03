@@ -143,6 +143,12 @@ function onload() {
 				setGameStage(GAME_OVER);
 			}
 			CanClickBall = true;
+			//取得鼠標位置，找出該點，再跑一次hingBall
+			let newBall = document.elementFromPoint(MouseX, MouseY);
+			let beforePoints = findTogetherBall(
+				parseInt(newBall.dataset.x, 10),
+				parseInt(newBall.dataset.y, 10));
+			hintBall(beforePoints);
 		}
 	});
 	window.addEventListener("resize", function () {
