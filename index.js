@@ -32,7 +32,9 @@ const assetLoader = new AssetLoader({
 	[SOUND_GAME_OVER]: 'audio/gameover.mp3',
 	[SOUND_BALL_LESS]: 'audio/less.mp3',
 	[SOUND_BALL_MANY]: 'audio/many.mp3',
-	[SOUND_BALL_MORE]: 'audio/more.mp3'
+	[SOUND_BALL_MORE]: 'audio/more.mp3',
+	fullscreen_on: 'image/fullscreen_on.svg',
+	fullscreen_off: 'image/fullscreen_off.svg',
 });
 let currentBgMusic;
 
@@ -62,6 +64,7 @@ function onload() {
 
 	document.querySelector('#game_area').addEventListener('mousemove', onMouseUpdate, false);
 	document.querySelector('#game_area').addEventListener('mouseenter', onMouseUpdate, false);
+	document.querySelector('#btn_fullscreen').addEventListener('click', () => { toggleFullScreen(); });
 	document.querySelector('#btn_start_game').addEventListener('click', () => {
 		assetLoader.AssetDictionary[SOUND_BUTTON_CLICK].play();
 		switch (CurrentStage) {
@@ -155,10 +158,27 @@ function onload() {
 		resizeGameArea();
 	});
 }
+
 function onMouseUpdate(e) {
 	MouseX = e.pageX;
 	MouseY = e.pageY;
 }
+
+function toggleFullScreen() {
+	var doc = window.document;
+	var docEl = doc.documentElement;
+
+	var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+	var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+	if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+		requestFullScreen.call(docEl);
+	}
+	else {
+		cancelFullScreen.call(doc);
+	}
+}
+
 /**
 * 設定遊戲區域寬高
 */
@@ -286,6 +306,7 @@ function resetMatrix() {
 		}
 	}
 }
+
 /**
 * 建立matrix對應的DOM
 * */
@@ -300,6 +321,7 @@ function renderMatrix() {
 	}
 	MatrixArea.innerHTML = ball_html;
 }
+
 /**
 * 將遊戲數值更新到UI上
 */
@@ -315,6 +337,7 @@ function updateGameStateToUi() {
 		}
 	}
 }
+
 /**
 * 根據計算消除的數量計算分數
 * @param object[] points
