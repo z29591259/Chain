@@ -9,12 +9,12 @@ const GAME_START = 2;
 const GAME_PLAYING = 3;
 const GAME_OVER = 4;
 
-const TEXT_CLICK_START = '點擊開始遊戲!';
-const TEXT_GAME_OVER_NOVICE = '~初心者~<br />歡迎繼續挑戰喔';
-const TEXT_GAME_OVER_INTERMEDIATE = '~熟手~<br />表現得不錯喔!';
-const TEXT_GAME_OVER_EXPERT = '~高手~<br />凡人到不了的境界!';
-const TEXT_GAME_OVER_MASTER = '~達人~<br />無法置信的強大!!';
-const TEXT_GAME_OVER_HOLY = '~真．達人~<br />真是太不可思議了!!!';
+const TEXT_CLICK_START = '點擊開始遊戲!<br />Click to start game.';
+const TEXT_GAME_OVER_NOVICE = '~初心者 newbie~<br />歡迎繼續挑戰喔<br />Keep trying';
+const TEXT_GAME_OVER_INTERMEDIATE = '~熟手 Adept~<br />表現得不錯喔!<br />Well done';
+const TEXT_GAME_OVER_EXPERT = '~高手 Proficient~<br />凡人到不了的境界!<br />Excellent';
+const TEXT_GAME_OVER_MASTER = '~達人 Expert~<br />無法置信的強大!!<br />Masterpiece';
+const TEXT_GAME_OVER_HOLY = '~真．達人 Master~<br />真是太不可思議了!!!<br />Unbelievable!';
 
 const SOUND_BG1 = 'bg1';
 const SOUND_BG2 = 'bg2';
@@ -148,10 +148,12 @@ function onload() {
 			CanClickBall = true;
 			//取得鼠標位置，找出該點，再跑一次hingBall
 			let newBall = document.elementFromPoint(MouseX, MouseY);
-			let beforePoints = findTogetherBall(
-				parseInt(newBall.dataset.x, 10),
-				parseInt(newBall.dataset.y, 10));
-			hintBall(beforePoints);
+			if (newBall.classList.contains('ball')) {
+				let beforePoints = findTogetherBall(
+					parseInt(newBall.dataset.x, 10),
+					parseInt(newBall.dataset.y, 10));
+				hintBall(beforePoints);
+			}
 		}
 	});
 	window.addEventListener("resize", function () {
@@ -210,14 +212,14 @@ function setGameStage(stage) {
 			assetLoader
 				.Progress((key, percent, successCount, totalCount) => {
 					//console.log('key=>'+key+', percent=>'+percent+', successCount=>'+successCount+', totalCount=>'+totalCount);
-					setOverlay('正在載入...<br />' + percent + '%', true);
+					setOverlay('正在載入...' + percent + '%' + '<br />Loading...' + percent + '%', true);
 					if (percent === 100) { setGameStage(GAME_READY); }
 				}).LoadError((key, errorCount, totalCount) => {
 					console.log('key=>' + key + ', errorCount=>' + errorCount + ', totalCount=>' + totalCount);
 				}).StartUntilEnd();
 			break;
 		case GAME_READY:
-			document.querySelector('#btn_start_game').innerText = '開始遊戲';
+			document.querySelector('#btn_start_game').innerText = '開始遊戲 Start';
 			document.querySelector('#btn_undo').classList.add('not-show');
 			setOverlay(TEXT_CLICK_START, true);
 			resetMatrix();
@@ -239,7 +241,7 @@ function setGameStage(stage) {
 			playBgMusic();
 			break;
 		case GAME_PLAYING:
-			document.querySelector('#btn_start_game').innerText = '回主選單';
+			document.querySelector('#btn_start_game').innerText = '回主選單 Back to menu';
 			setOverlay('', false);
 			break;
 		case GAME_OVER:
