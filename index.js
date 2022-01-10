@@ -264,7 +264,8 @@ function setGameStage(stage) {
 }
 
 function setupBgMusic() {
-	currentBgMusic = assetLoader.AssetDictionary[SOUND_BG1];
+	let bgList = [SOUND_BG1, SOUND_BG2, SOUND_BG3];
+	currentBgMusic = assetLoader.AssetDictionary[bgList[this.getRandom(0, 2)]];
 	assetLoader.AssetDictionary[SOUND_BG1].addEventListener("ended", () => {
 		currentBgMusic.currentTime = 0;
 		currentBgMusic = assetLoader.AssetDictionary[SOUND_BG2];
