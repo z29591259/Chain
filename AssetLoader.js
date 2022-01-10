@@ -90,7 +90,7 @@ class AssetLoader {
 	*/
 	LoadError(callback) {
 		if (callback && typeof callback === "function") {
-			this.OnLoadError = callback;
+			this.OnLoadErrorCallback = callback;
 		}
 		return this;
 	}
