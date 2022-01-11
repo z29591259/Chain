@@ -36,14 +36,15 @@ class AssetLoader {
 				const image = new Image();
 				if (image.complete) {
 					this._OnProgress(key);
+				} else {
+					image.onload = () => {
+						this._OnProgress(key);
+					};
+					image.onerror = () => {
+						this._OnLoadError(key);
+					};
+					image.src = this.AssetSrcDictionary[key];
 				}
-				image.onload = () => {
-					this._OnProgress(key);
-				};
-				image.onerror = () => {
-					this._OnLoadError(key);
-				};
-				image.src = this.AssetSrcDictionary[key];
 				this.AssetDictionary[key] = image;
 			}
 			else {
